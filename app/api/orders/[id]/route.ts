@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
@@ -6,14 +6,15 @@ import { verifyToken } from "@/lib/auth";
 async function getUserFromCookie() {
   const token = (await cookies()).get("auth-token")?.value;
   if (!token) return null;
-
   return verifyToken(token);
 }
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: Promise<{ params: { id: string } }>
 ) {
+  const { params } = await context;
+
   const payload = await getUserFromCookie();
   if (!payload) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

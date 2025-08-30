@@ -1,5 +1,5 @@
 // app/api/cart/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
@@ -26,7 +26,7 @@ export async function GET() {
   return NextResponse.json(cart);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const payload = await getUserFromCookie();
   if (!payload)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
