@@ -7,7 +7,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  disable,
+}: {
+  product: Product;
+  disable?: boolean;
+}) {
   const { isAuthenticated } = useAuthStore();
   const { addItem, isLoading } = useCartStore();
   const router = useRouter();
@@ -26,16 +32,19 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const handleProductClick = () => {
+    if (disable) return;
     router.push(`/product/${product.id}`);
   };
 
+  const cursorType = disable ? "" : "cursor-pointer";
+
   return (
-    <div className="bg-white p-4 rounded-2xl shadow hover:shadow-lg transition-shadow">
-      <div className="relative cursor-pointer" onClick={handleProductClick}>
+    <div className="bg-white max-w-[500px] m-auto text-gray-400 p-4 rounded-2xl shadow hover:shadow-lg transition-shadow">
+      <div className={"relative" + cursorType} onClick={handleProductClick}>
         <img
           src={product.image || "/placeholder.svg"}
           alt={product.name || "Product"}
-          className="object-cover w-fit h-auto rounded-xl"
+          className="object-cover w-full h-auto rounded-xl"
         />
         {!product.inStock && (
           <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
@@ -44,7 +53,7 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="mt-3 cursor-pointer" onClick={handleProductClick}>
+      <div className={"mt-3" + cursorType} onClick={handleProductClick}>
         <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
           {product.name || "Unnamed Product"}
         </h3>
@@ -55,7 +64,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </p>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold text-blue-600">
             ${product.price?.toString() || "0.00"}
@@ -69,12 +78,13 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <Button
           onClick={(e) => {
+            if (disable) return;
             e.stopPropagation();
             handleAddToCart();
           }}
           disabled={!product.inStock || isLoading}
           size="sm"
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 text-green-950"
         >
           <ShoppingCart className="h-4 w-4" />
           {isLoading ? "Adding..." : "Add to Cart"}

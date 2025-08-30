@@ -135,7 +135,7 @@ export default function RegisterClient() {
               Join us and start shopping today
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-8 pb-8">
+          <form onSubmit={handleRegister} className="px-8 pb-8">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -228,7 +228,7 @@ export default function RegisterClient() {
                 "Create Account"
               )}
             </Button>
-          </CardContent>
+          </form>
         </Card>
       </div>
     </div>
