@@ -1,6 +1,4 @@
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 export interface JwtPayload {
@@ -10,13 +8,24 @@ export interface JwtPayload {
 }
 
 export function signToken(payload: JwtPayload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: 7 * 24 * 60 * 60 * 1000 });
+  try {
+    const jwt = require("jsonwebtoken");
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  } catch (error) {
+    console.error("Error signing token:", error);
+    return null;
+  }
 }
 
 export function verifyToken(token: string) {
   try {
+    if (!token || typeof token !== "string") {
+      return null;
+    }
+    const jwt = require("jsonwebtoken");
     return jwt.verify(token, JWT_SECRET) as JwtPayload;
   } catch (error) {
+    console.error("Error verifying token:", error);
     return null;
   }
 }

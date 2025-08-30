@@ -13,11 +13,12 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
+  initialize: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -35,7 +36,21 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           isAuthenticated: false,
         }),
+
+      initialize: () => {
+        const state = get();
+        if (state.token && state.user) {
+          set({ isAuthenticated: true });
+        }
+      },
     }),
-    { name: "auth-store" } // stored in localStorage
+    {
+      name: "auth-store",
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.initialize();
+        }
+      },
+    }
   )
 );
